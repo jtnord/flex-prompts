@@ -1,7 +1,6 @@
 -- This is the prompt module function.
 local function k8s_module(args)
     -- todo make this async to not slow the prompt down
-    -- todo handle no kubectl gracefully
 
     local ns = "default"
     local context = ""
@@ -13,7 +12,11 @@ local function k8s_module(args)
           break
         end
     end
-    p:close()
+    if (p:close() == nill ) then
+      -- kubectl not found
+      return
+    end
+
     p = io.popenyield("kubectl.exe config current-context 2>nul", "rt")
     for line in p:lines() do
         local m = line:match("(.+)$")
